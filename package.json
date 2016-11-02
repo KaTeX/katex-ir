@@ -1,0 +1,18 @@
+{
+  "name": "katex-ir",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kevin Barabash <kevinb@khanacademy.org>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-loader": "^6.2.7",
+    "babel-plugin-syntax-flow": "^6.18.0",
+    "babel-plugin-transform-flow-strip-types": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "webpack": "^1.13.3"
+  }
+}
