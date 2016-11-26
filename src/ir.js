@@ -1,61 +1,19 @@
 // @flow
 
-type Node = HBox | VBox | Char | Rule | Kern | Glue | Penalty | Special;
+import type {
+    Node,
+    FontId,
+    HBox,
+    VBox,
+    HList,
+    VList,
+    Rule,
+    Glue,
+    Char,
+} from './types'
 
-type Box = {
-    type: 'Box',
-    width?: number,  // if undefined, contents of box define its width
-    height: number,
-    depth: number,
-    content: Node[],
-    shift: number,
-}
-
-type HBox = Box & { kind: 'HBox' }
-type VBox = Box & { kind: 'VBox' }
-
-type FontId = string
-
-type Char = {
-    type: 'Char',
-    font: FontId,
-    char: string,
-}
-
-type Rule = {
-    type: 'Rule',
-    width?: number, // if undefined occupies the width of the containing box
-    height: number,
-    depth: number,
-}
-
-type Kern = {
-    type: 'Kern',
-    amount: number,
-}
-
-type Glue = {
-    type: 'Glue',
-    size: number,
-    stretch: number,
-    shrink: number,
-}
-
-type Penalty = {
-    type: 'Penalty',
-    potential: number,
-    adequacy: number,
-}
-
-type Special = {
-    type: 'Special',
-    width?: number,
-    height: number,
-    depth: number,
-}
-
-type HList = Node[];
-type VList = Node[];
+import {getMetrics} from './metrics'
+import WebFont from 'webfontloader';
 
 const content: HList = [];
 
@@ -67,7 +25,7 @@ const makeChar = (font: FontId, char: string) => {
     }
 }
 
-const sansSerifChar = makeChar.bind(null, 'sans-serif');
+const mainRegularChar = makeChar.bind(null, 'Main-Regular');
 
 const makeKern = (amount: number) => {
     return {
@@ -76,33 +34,24 @@ const makeKern = (amount: number) => {
     }
 }
 
-content.push(sansSerifChar('1'))
-content.push(makeKern(0.2))   // TODO(kevinb) get real kern amounts
-content.push(sansSerifChar('+'))
-content.push(makeKern(0.2))
-content.push(sansSerifChar('2'))
-content.push(makeKern(0.2))
-content.push(sansSerifChar('='))
-content.push(makeKern(0.2))
-content.push(sansSerifChar('3'))
+// TODO(kevinb) make these configurable
+const thinmuskip = 0.16667;
+const medmuskip = 0.22222;
+const thickmuskip = 0.27778;
 
-type GlyphMetrics = [
-    number,  // height
-    number,  // depth
-];
-
-// TODO(kevinb) get real metrics
-const glyphMetrics: {[key: string]: GlyphMetrics} = {
-    '1': [20, 0],
-    '2': [20, 0],
-    '3': [20, 0],
-    '+': [14, -7],
-    '-': [11, -9],
-    '=': [13, -8],
-}
+content.push(mainRegularChar('5'))
+content.push(makeKern(thinmuskip))
+content.push(mainRegularChar('+'))
+content.push(makeKern(thinmuskip))
+content.push(mainRegularChar('7'))
+content.push(makeKern(thickmuskip))
+content.push(mainRegularChar('='))
+content.push(makeKern(thickmuskip))
+content.push(mainRegularChar('1'))
+content.push(mainRegularChar('2'))
 
 const charHeight = (node: Char) => {
-    const metrics = glyphMetrics[node.char]
+    const metrics = getMetrics(node.char);
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
@@ -110,7 +59,7 @@ const charHeight = (node: Char) => {
 }
 
 const charDepth = (node: Char) => {
-    const metrics = glyphMetrics[node.char]
+    const metrics = getMetrics(node.char);
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
@@ -119,7 +68,7 @@ const charDepth = (node: Char) => {
 
 const height = (node: Node) => {
     switch (node.type) {
-        case 'Box': return node.height
+        case 'Box': return node.height  // TODO: handle shift
         case 'Rule': return node.height
         case 'Char': return charHeight(node)
         default: return 0
@@ -128,7 +77,7 @@ const height = (node: Node) => {
 
 const depth = (node: Node) => {
     switch (node.type) {
-        case 'Box': return node.depth
+        case 'Box': return node.depth   // TODO: handle shift
         case 'Rule': return node.depth
         case 'Char': return charDepth(node)
         default: return 0
@@ -153,7 +102,6 @@ const simpleRun: HBox = makeHBox(content)
 
 console.log(simpleRun)
 
-
 const vsize = (node: Node) => {
     switch (node.type) {
         case 'Char': return charHeight(node) + charDepth(node)
@@ -171,45 +119,42 @@ const sum = (values: number[]): number => {
 
 const vlistSize = (vlist: VList) => sum(vlist.map(vsize))
 
-const makeVBox = (node: Node, upList: VList, dnList: VList, shift = 0): VBox => {
-    return {
-        type: 'Box',
-        kind: 'VBox',
-        content: [...upList, node, ...dnList],
-        height: height(node) + vlistSize(upList),
-        depth: depth(node) + vlistSize(dnList),
-        shift: shift,
-    }
-}
+const makeVBox = (node: Node, upList: VList, dnList: VList, shift = 0): VBox =>
+({
+    type: 'Box',
+    kind: 'VBox',
+    content: [...upList, node, ...dnList],
+    height: height(node) + vlistSize(upList),
+    depth: depth(node) + vlistSize(dnList),
+    shift: shift,
+})
 
 const numerator = makeHBox([
-    sansSerifChar('1')
+    mainRegularChar('1')
 ])
 
 const denominator = makeHBox([
-    sansSerifChar('2'),
+    mainRegularChar('2'),
     makeKern(0.2),
-    sansSerifChar('+'),
+    mainRegularChar('+'),
     makeKern(0.2),
-    sansSerifChar('3'),
+    mainRegularChar('3'),
 ])
 
-const makeRule = (height: number, depth: number): Rule => {
-    return {
-        type: 'Rule',
-        height: height,
-        depth: depth,
-    }
-}
+const makeRule = (height: number, depth: number): Rule =>
+({
+    type: 'Rule',
+    height: height,
+    depth: depth,
+})
 
-const makeGlue = (size: number, shrink = 0, stretch = 0): Glue => {
-    return {
-        type: 'Glue',
-        size: size,
-        shrink: shrink,
-        stretch: stretch,
-    }
-}
+const makeGlue = (size: number, shrink = 0, stretch = 0): Glue =>
+({
+    type: 'Glue',
+    size: size,
+    shrink: shrink,
+    stretch: stretch,
+})
 
 const fraction = makeVBox(
     makeRule(0.1, 0.1),  // reference node
@@ -222,3 +167,25 @@ const fraction = makeVBox(
 )
 
 console.log(fraction);
+console.log(`denominator depth = ${hlistDepth(denominator.content)}`);
+console.log(`denominator height = ${hlistHeight(denominator.content)}`);
+
+import {createCanvas, drawLayout} from './canvas-renderer'
+import {createSvg, drawSvgLayout} from './svg-renderer'
+
+WebFont.load({
+    custom: {
+        families: ['Main_Regular:n4'],
+    },
+    active: function(familyName, fvd) {
+        const context = createCanvas(512, 256)
+        if (context) {
+            drawLayout(context, simpleRun)
+        }
+
+        const svg = createSvg(512, 256);
+        if (svg) {
+            drawSvgLayout(svg, simpleRun);
+        }
+    },
+});
