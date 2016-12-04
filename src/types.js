@@ -22,11 +22,12 @@ export type Char = {
     char: string,
 }
 
+// TODO(kevinb) add units to the dimensions
 export type Rule = {
     type: 'Rule',
-    width?: number, // if undefined occupies the width of the containing box
-    height: number,
-    depth: number,
+    height: number | '*',
+    depth: number | '*',
+    width: number | '*',
 }
 
 export type Kern = {
