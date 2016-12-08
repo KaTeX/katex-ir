@@ -137,7 +137,7 @@ const numerator = makeHBox([
 ])
 
 const denominator = makeHBox([
-    mainRegularChar('y'),
+    mainRegularChar('2'),
     makeKern(thinmuskip),
     mainRegularChar('+'),
     makeKern(thinmuskip),
@@ -246,8 +246,14 @@ WebFont.load({
             drawSvgLayout(svg, expr);
         }
 
-        const container = document.createElement('div')
-        const div = renderHTML(container, expr)
-        document.body.appendChild(div)
+        const container = document.createElement('span')
+        renderHTML(container, expr)
+        container.style.position = 'relative'
+        container.style.top = '20px'
+        const wrapper = document.createElement('span')
+        wrapper.style.display = 'inline-block'
+        wrapper.style.border = 'solid 1px gray'
+        wrapper.appendChild(container)
+        document.body.appendChild(wrapper)
     },
 });
