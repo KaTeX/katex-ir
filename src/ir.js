@@ -137,7 +137,7 @@ const numerator = makeHBox([
 ])
 
 const denominator = makeHBox([
-    mainRegularChar('2'),
+    mainRegularChar('y'),
     makeKern(thinmuskip),
     mainRegularChar('+'),
     makeKern(thinmuskip),
@@ -209,12 +209,18 @@ const fraction = makeVBox(
     sigmas.axisHeight[0],
 )
 
+// TODO(kevinb) put the fraction in an HBox with 1.2 pt kerns on either side
+// TODO(kevinb) all distances should have a unit of measure, e.g. em, pt, etc.
+const fontSize = 32
+
 const expr = makeHBox([
     mainRegularChar('2'),
     makeKern(medmuskip),
     mainRegularChar('+'),
-    makeKern(thickmuskip),
+    makeKern(medmuskip),    // this should change depending on the current style
+    makeKern(1.2 / 10),     // scaled according to the base font size, not the current style
     fraction,
+    makeKern(1.2 / 10),
 ])
 
 console.log(fraction);
@@ -240,7 +246,8 @@ WebFont.load({
             drawSvgLayout(svg, expr);
         }
 
-        const div = renderHTML(simpleRun)
+        const container = document.createElement('div')
+        const div = renderHTML(container, expr)
         document.body.appendChild(div)
     },
 });

@@ -93,6 +93,7 @@ export function drawSvgLayout(svg: Element, layout: HBox | VBox) {
     const pen = {x: 0, y:0}
     const fontSize = 32
 
+    // TODO(kevinb): output an SVG string so that this can be used on the server
     switch (layout.kind) {
         case 'HBox':
             for (const node: Node of layout.content) {
@@ -193,6 +194,7 @@ export function drawSvgLayout(svg: Element, layout: HBox | VBox) {
                         if (node.kind === 'HBox') {
                             const nodeWidth = width(node)
                             if (nodeWidth < w) {
+                                // TODO(kevinb) actually check if there's glue
                                 pen.x += fontSize * (w - nodeWidth) / 2
                             }
                             const transform = `translate(${pen.x}, ${pen.y})`
