@@ -1,5 +1,8 @@
 // @flow
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+
 import type {
     Node,
     FontId,
@@ -12,8 +15,9 @@ import type {
     Char,
 } from './types'
 
-import { getMetrics } from './metrics'
-import WebFont from 'webfontloader';
+import {getMetrics} from './metrics'
+import Renderer from './svg-component'
+import WebFont from 'webfontloader'
 
 const content: HList = [];
 
@@ -250,24 +254,25 @@ WebFont.load({
         families: ['Main_Regular:n4'],
     },
     active: function(familyName, fvd) {
-        const context = createCanvas(512, 256)
+        const context = createCanvas(320, 200)
         if (context) {
             drawLayout(context, simpleRun)
         }
 
-        const svg = createSvg(512, 256);
+        const svg = createSvg(320, 200);
         if (svg) {
             drawSvgLayout(svg, expr);
         }
 
         const container = document.createElement('span')
         renderHTML(container, expr)
-            // container.style.position = 'relative'
-            // container.style.top = '20px'
-        const wrapper = document.createElement('span')
-        wrapper.style.display = 'inline-block'
+        const wrapper = document.createElement('div')
         wrapper.style.border = 'solid 1px gray'
         wrapper.appendChild(container)
         document.body.appendChild(wrapper)
+
+        const reactContainer = document.createElement('div')
+        document.body.appendChild(reactContainer)
+        ReactDOM.render(<Renderer layout={expr}/>, reactContainer)
     },
 });
