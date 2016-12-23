@@ -171,13 +171,13 @@ export function drawSvgLayout(svg: Element, layout: HBox | VBox) {
                 }
             }
 
-            console.log(deferred)
+            // console.log(deferred)
 
             const w = vwidth(layout)
-            console.log(`w = ${w}`)
+            // console.log(`w = ${w}`)
 
             for (const {g, node, pen} of deferred) {
-                console.log(node);
+                // console.log(node);
                 switch (node.type) {
                     case 'Rule':
                         const rect = document.createElementNS(svgNS, 'rect')

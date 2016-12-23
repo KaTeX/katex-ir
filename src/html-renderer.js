@@ -25,31 +25,60 @@ const vsize = (node: Node) => {
         case 'Char': return charHeight(node) + charDepth(node)
         case 'Box': return node.height + node.depth
         case 'Rule': return (node.height === '*' ? 0 : node.height) +
-            (node.depth === '*' ? 0 : node.depth)
+                (node.depth === '*' ? 0 : node.depth)
         case 'Glue': return node.size
         case 'Kern': return node.amount
         default: return 0
     }
 }
 
+const height = (node: Node) => {
+    switch (node.type) {
+        // Note: same height for all Chars b/c the baselines already match
+        case 'Char': return getMetrics('2')[0]
+        case 'Box': return node.height + node.shift
+        case 'Rule': return node.height === '*' ? 0 : node.height
+        default: return 0
+    }
+}
+
+const depth = (node: Node) => {
+    switch (node.type) {
+        // Note: same depth for all Chars b/c the baselines already match
+        case 'Char': return getMetrics('2')[1]
+        case 'Box': return node.depth
+        case 'Rule': return node.depth === '*' ? 0 : node.depth
+        default: return 0
+    }
+}
+
 export function renderHTML(container: Element, layout: HBox | VBox) {
 
-    const pen = {x: 100, y:100}
+    const pen = { x: 100, y: 100 }
     const fontSize = 32
 
     switch (layout.kind) {
         case 'HBox':
             container.setAttribute('style', generateStyle({
-                display: 'flex',
-                'flex-direction': 'row',
-                'align-items': 'flex-start',
-            }))
+                    display: 'flex',
+                    'flex-direction': 'row',
+                    'align-items': 'flex-start',
+                }))
+            let maxHeight = -Infinity
+            let maxDepth = -Infinity
+            const deferred: any[] = []
             for (const node: Node of layout.content) {
                 const span = document.createElement('span')
+                maxHeight = Math.max(maxHeight, height(node))
+                maxDepth = Math.max(maxDepth, depth(node))
                 switch (node.type) {
                     case 'Box':
                         renderHTML(span, node)
                         container.appendChild(span)
+                        deferred.push({
+                            node: node,
+                            span: span,
+                        })
                         break
                     case 'Kern':
                         span.setAttribute('style', generateStyle({
@@ -68,6 +97,10 @@ export function renderHTML(container: Element, layout: HBox | VBox) {
                         }))
                         span.innerText = node.char
                         container.appendChild(span)
+                        deferred.push({
+                            node: node,
+                            span: span,
+                        })
                         break
                     case 'Glue':
                         span.setAttribute('style', generateStyle({
@@ -78,19 +111,26 @@ export function renderHTML(container: Element, layout: HBox | VBox) {
                         break
                 }
             }
+            // shift nodes after figuring out the max height
+            for (const {node, span} of deferred) {
+                if (height(node) < maxHeight) {
+                    // TODO: the baseline of the operators is already lined up
+                    // with the baseline of the numbers and variables, so we
+                    // have to match that baseline
+                    const diff = maxHeight - height(node)
+                    console.log(maxHeight - height(node))
+                    span.style.position = 'relative';
+                    span.style.top = `${fontSize * diff}px`;
+                }
+            }
             break
         case 'VBox':
-            console.log(layout)
+            // console.log(layout)
             const fudgeFactor = 2
             container.setAttribute('style', generateStyle({
                 display: 'flex',
                 'flex-direction': 'column',
                 position: 'relative',
-                // TODO(kevinb) shift items that are smaller than the largest item
-                top: -(fontSize * layout.height)
-                    + 20.63 // height of the 2 that comes before the fraction
-                    - 0.25 * fontSize  // axis height
-                    - 0.02 * fontSize, // half the height of the fraction bar
             }))
             for (const node: Node of layout.content) {
                 const span = document.createElement('span')
@@ -126,4 +166,3 @@ export function renderHTML(container: Element, layout: HBox | VBox) {
 
     return container
 }
-
