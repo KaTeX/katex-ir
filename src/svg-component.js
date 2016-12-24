@@ -86,6 +86,7 @@ export const transmogrify = (layout: HBox | VBox): any => {
             }
             break;
         case 'VBox':
+            const w = vwidth(layout)
             const deferred: any[] = []
             pen[1] = pen[1] - fontSize * layout.height
             // TODO(kevinb) convert this to a flatMap
@@ -95,6 +96,12 @@ export const transmogrify = (layout: HBox | VBox): any => {
                         pen[1] += fontSize * node.height
                         const g = transmogrify(node)
                         g.pen = [...pen]
+                        if (node.kind === 'HBox') {
+                            if (g.width < w) {
+                                // TODO(kevinb) actually check if there's glue
+                                g.pen[0] += fontSize * (w - g.width) / 2
+                            }
+                        }
                         result.children.push(g)
                         pen[1] += fontSize * node.depth
                         break
@@ -119,7 +126,7 @@ export const transmogrify = (layout: HBox | VBox): any => {
                             const rect = {
                                 type: 'rect',
                                 pen: [...pen],
-                                width: Infinity,    // TODO(kevinb) check if it's a '*'
+                                width: fontSize * w,
                                 height: fontSize * (node.height + node.depth),
                                 fill: 'black',      // TODO(kevinb) update the color
                             }
@@ -131,27 +138,6 @@ export const transmogrify = (layout: HBox | VBox): any => {
                         console.log(`unhandled node of type: ${node.type}`);
                 }
             }
-
-            const w = vwidth(layout)
-
-            for (const node: any of result.children) {
-                switch (node.type) {
-                    case 'rect':
-                        node.width = fontSize * w;
-                        break;
-                    case 'g':
-                        // TODO(kevinb) instead of post-processing, we should
-                        // be calculating the width first and then using that
-                        // information when layingout HBoxes
-                        // if (node.kind === 'HBox') {
-                        if (node.width < w) {
-                            // TODO(kevinb) actually check if there's glue
-                            node.pen[0] += fontSize * (w - node.width) / 2
-                        }
-                        // }
-                }
-            }
-            break
     }
 
     return result;
@@ -163,21 +149,21 @@ export default class Renderer extends React.Component {
         layout: HBox | VBox
     }
 
-    _render(layout: any) {
+    _render(layout: any, key?: string) {
         const pen = layout.pen;
         console.log(layout);
 
         if (layout.type === 'text') {
             const {fontFamily, fontSize, text} = layout;
-            return <text x={pen[0]} y={pen[1]} fontFamily={fontFamily} fontSize={fontSize}>
+            return <text key={key} x={pen[0]} y={pen[1]} fontFamily={fontFamily} fontSize={fontSize}>
                 {text}
             </text>
         } else if (layout.type === 'rect') {
             const {width, height} = layout;
-            return <rect x={pen[0]} y={pen[1]} width={width} height={height}/>
+            return <rect key={key} x={pen[0]} y={pen[1]} width={width} height={height}/>
         } else if (layout.type === 'g') {
-            return <g transform={`translate(${pen[0]}, ${pen[1]})`}>
-                {layout.children.map((child) => this._render(child))}
+            return <g key={key} transform={`translate(${pen[0]}, ${pen[1]})`}>
+                {layout.children.map((child, i) => this._render(child, i))}
             </g>
         }
     }
