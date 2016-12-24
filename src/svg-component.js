@@ -96,9 +96,8 @@ export const transform = (layout: HBox | VBox, parentWidth?: number = 0): any =>
                         const g = transform(node, naturalWidth2)
                         const shift = fontSize * node.shift
                         g.pen = [pen[0], pen[1] - shift]
-                        // TODO(kevinb) update pen position
-                        // pen[0] += width(node)
                         result.children.push(g)
+                        pen[0] += fontSize * width(node)
                         break
                     case 'Char':
                         const text = {
@@ -137,12 +136,6 @@ export const transform = (layout: HBox | VBox, parentWidth?: number = 0): any =>
                         pen[1] += fontSize * node.height
                         const g = transform(node, naturalWidth)
                         g.pen = [...pen]
-                        // if (node.kind === 'HBox') {
-                        //     if (g.width < naturalWidth) {
-                        //         // TODO(kevinb) actually check if there's glue
-                        //         g.pen[0] += fontSize * (naturalWidth - g.width) / 2
-                        //     }
-                        // }
                         result.children.push(g)
                         pen[1] += fontSize * node.depth
                         break

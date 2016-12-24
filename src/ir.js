@@ -241,6 +241,11 @@ const expr = makeHBox([
     makeKern(1.2 / 10), // scaled according to the base font size, not the current style
     fraction,
     makeKern(1.2 / 10),
+    makeKern(medmuskip),
+    mainRegularChar('+'),
+    makeKern(medmuskip),
+    mainRegularChar('5'),
+    mainRegularChar('7'),
 ])
 
 // console.log(fraction);
