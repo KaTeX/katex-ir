@@ -16,7 +16,7 @@ import type {
 } from './types'
 
 import {getMetrics} from './metrics'
-import Renderer from './svg-component'
+import Renderer, {transmogrify} from './svg-component'
 import WebFont from 'webfontloader'
 
 const content: HList = [];
@@ -274,5 +274,8 @@ WebFont.load({
         const reactContainer = document.createElement('div')
         document.body.appendChild(reactContainer)
         ReactDOM.render(<Renderer layout={expr}/>, reactContainer)
+
+        const result = transmogrify(expr)
+        console.log(result)
     },
 });

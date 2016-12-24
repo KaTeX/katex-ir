@@ -99,6 +99,7 @@ export function drawSvgLayout(svg: Element, layout: HBox | VBox) {
             for (const node: Node of layout.content) {
                 switch (node.type) {
                     case 'Box':
+                        // TODO(kevinb) update the pen position
                         const g = document.createElementNS(svgNS, 'g')
                         const shift = fontSize * node.shift;
                         drawSvgLayout(g, node)
