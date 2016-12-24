@@ -12,11 +12,12 @@ import type {
     VList,
     Rule,
     Glue,
+    GlueMeasurement,
     Char,
 } from './types'
 
 import {getMetrics} from './metrics'
-import Renderer, {transmogrify} from './svg-component'
+import Renderer, {transform} from './svg-component'
 import WebFont from 'webfontloader'
 
 const content: HList = [];
@@ -170,13 +171,11 @@ const makeRule = (height: number | '*', depth: number | '*', width: number | '*'
         width: width,
     })
 
-const makeGlue = (size: number, shrink = 0, stretch = 0): Glue =>
-    ({
-        type: 'Glue',
-        size: size,
-        shrink: shrink,
-        stretch: stretch,
-    })
+const makeGlue = (
+    size: number,
+    stretch: GlueMeasurement = [0, 0, 0, 0],
+    shrink: GlueMeasurement = [0, 0, 0, 0]
+): Glue => ({type: 'Glue', size, stretch, shrink})
 
 var sigmas = {
     slant: [0.250, 0.250, 0.250], // sigma1
@@ -205,23 +204,26 @@ var sigmas = {
 
 const xi8 = 0.04; // default rule width
 
+const hfil = (value: number = 1): GlueMeasurement => [0, value, 0, 0]
+const hfill = (value: number = 1): GlueMeasurement => [0, 0, value, 0]
+const hfilll = (value: number = 1): GlueMeasurement => [0, 0, 0, value]
 
 const fraction = makeVBox(
     makeRule(0.5 * xi8, 0.5 * xi8, '*'), // reference node
     [
         makeHBox([
-            makeGlue(0, Infinity, Infinity),
+            makeGlue(0, hfil()),
             numerator,
-            makeGlue(0, Infinity, Infinity),
+            makeGlue(0, hfil()),
         ]),
         makeKern(sigmas.num1[0] / 2), // TODO(kevinb) figure out the correct numShift
     ], // upList
     [
         makeKern(sigmas.denom1[0] / 2), // TODO(kevinb) figure out the correct denomShift
         makeHBox([
-            makeGlue(0, Infinity, Infinity),
+            makeGlue(0, hfil()),
             denominator,
-            makeGlue(0, Infinity, Infinity),
+            makeGlue(0, hfil()),
         ]),
     ], // dnList
     sigmas.axisHeight[0],
@@ -275,7 +277,7 @@ WebFont.load({
         document.body.appendChild(reactContainer)
         ReactDOM.render(<Renderer layout={expr}/>, reactContainer)
 
-        const result = transmogrify(expr)
+        const result = transform(expr)
         console.log(result)
     },
 });

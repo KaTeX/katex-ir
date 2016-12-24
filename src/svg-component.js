@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 
-import type {Node, Box, HBox, VBox, Char, VList, HList} from './types'
+import type {Node, Box, HBox, VBox, Char, VList, HList, Glue} from './types'
 import {getMetrics} from './metrics'
 
 const svgNS = 'http://www.w3.org/2000/svg'
@@ -44,7 +44,7 @@ const vwidth = (node: Node): number => {
     }
 }
 
-export const transmogrify = (layout: HBox | VBox): any => {
+export const transform = (layout: HBox | VBox, parentWidth?: number = 0): any => {
 
     const fontSize = 32
     const pen = [0, 0]
@@ -57,10 +57,43 @@ export const transmogrify = (layout: HBox | VBox): any => {
 
     switch(layout.kind) {
         case 'HBox':
+            const naturalWidth2 = width(layout)
+            let totalStretch = 0
+            let widthDiff = 0
+            let stretchIndex = 0
+
+            if (naturalWidth2 < parentWidth) {
+                const glues: Glue[] = []
+                for (const node: Node of layout.content) {
+                    if (node.type === 'Glue') {
+                        glues.push(node)
+                    }
+                }
+
+                // TODO(kevinb) figure out which measurement to use
+                // TODO(kevinb) handle negative values for fil, fill, and filll
+                let index = 0;
+                glues.forEach((glue: Glue) => {
+                    glue.stretch.forEach((value, i) => {
+                        if (value !== 0) {
+                            index = Math.max(index, i)
+                        }
+                    })
+                })
+
+                stretchIndex = index
+                widthDiff = parentWidth - naturalWidth2;
+                totalStretch = glues.reduce((total, glue) => {
+                    return total + glue.stretch[index];
+                }, 0);
+            } else if (naturalWidth2 > parentWidth) {
+
+            }
+
             for (const node: Node of layout.content) {
                 switch (node.type) {
                     case 'Box':
-                        const g = transmogrify(node)
+                        const g = transform(node, naturalWidth2)
                         const shift = fontSize * node.shift
                         g.pen = [pen[0], pen[1] - shift]
                         // TODO(kevinb) update pen position
@@ -76,17 +109,25 @@ export const transmogrify = (layout: HBox | VBox): any => {
                             text: node.char,
                         }
                         result.children.push(text)
-                        const [,,width] = getMetrics(node.char)
-                        pen[0] += fontSize * width
+                        const [,,w] = getMetrics(node.char)
+                        pen[0] += fontSize * w
                         break
                     case 'Kern':
                         pen[0] += fontSize * node.amount
                         break
+                    case 'Glue':
+                        if (totalStretch !== 0) {
+                            pen[0] += fontSize * (node.size + node.stretch[stretchIndex] / totalStretch * widthDiff)
+                        } else {
+                            pen[0] += fontSize * node.size
+                        }
+                        break
                 }
             }
+
             break;
         case 'VBox':
-            const w = vwidth(layout)
+            const naturalWidth = vwidth(layout)
             const deferred: any[] = []
             pen[1] = pen[1] - fontSize * layout.height
             // TODO(kevinb) convert this to a flatMap
@@ -94,14 +135,14 @@ export const transmogrify = (layout: HBox | VBox): any => {
                 switch (node.type) {
                     case 'Box':
                         pen[1] += fontSize * node.height
-                        const g = transmogrify(node)
+                        const g = transform(node, naturalWidth)
                         g.pen = [...pen]
-                        if (node.kind === 'HBox') {
-                            if (g.width < w) {
-                                // TODO(kevinb) actually check if there's glue
-                                g.pen[0] += fontSize * (w - g.width) / 2
-                            }
-                        }
+                        // if (node.kind === 'HBox') {
+                        //     if (g.width < naturalWidth) {
+                        //         // TODO(kevinb) actually check if there's glue
+                        //         g.pen[0] += fontSize * (naturalWidth - g.width) / 2
+                        //     }
+                        // }
                         result.children.push(g)
                         pen[1] += fontSize * node.depth
                         break
@@ -126,7 +167,7 @@ export const transmogrify = (layout: HBox | VBox): any => {
                             const rect = {
                                 type: 'rect',
                                 pen: [...pen],
-                                width: fontSize * w,
+                                width: fontSize * naturalWidth,
                                 height: fontSize * (node.height + node.depth),
                                 fill: 'black',      // TODO(kevinb) update the color
                             }
@@ -169,7 +210,7 @@ export default class Renderer extends React.Component {
     }
 
     render() {
-        const layout = transmogrify(this.props.layout);
+        const layout = transform(this.props.layout);
 
         return <svg width={320} height={200} viewBox='0 0 320 200'>
             <g transform='translate(100, 100)'>

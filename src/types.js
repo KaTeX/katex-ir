@@ -35,11 +35,13 @@ export type Kern = {
     amount: number,
 }
 
+export type GlueMeasurement = [number, number, number, number]
+
 export type Glue = {
     type: 'Glue',
     size: number,
-    stretch: number,
-    shrink: number,
+    stretch: GlueMeasurement,
+    shrink: GlueMeasurement,
 }
 
 export type Penalty = {
