@@ -17,7 +17,8 @@ import type {
 } from './types'
 
 import {getMetrics} from './metrics'
-import Renderer, {transform} from './svg-component'
+import Renderer from './svg-component'
+import process from './process'
 import WebFont from 'webfontloader'
 
 const content: HList = [];
@@ -263,7 +264,8 @@ WebFont.load({
     active: function(familyName, fvd) {
         const context = createCanvas(320, 200)
         if (context) {
-            drawLayout(context, simpleRun)
+            context.translate(100, 100)
+            drawLayout(context, process(expr))
         }
 
         const svg = createSvg(320, 200);
@@ -282,7 +284,7 @@ WebFont.load({
         document.body.appendChild(reactContainer)
         ReactDOM.render(<Renderer layout={expr}/>, reactContainer)
 
-        const result = transform(expr)
+        const result = process(expr)
         console.log(result)
     },
 });

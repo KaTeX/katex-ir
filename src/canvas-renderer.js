@@ -12,26 +12,21 @@ export function createCanvas(width: number, height: number) {
     return context
 }
 
-export function drawLayout(context: CanvasRenderingContext2D, layout: HBox) {
-    const pen = {x: 100, y:100}
+export function drawLayout(context: CanvasRenderingContext2D, layout: any) {
+    const pen = layout.pen
+
+    // TODO(kevinb) keep track of font and change it as necessary
     const fontSize = 32
-
-    context.save()
-
     context.font = `${fontSize}px Main_Regular`
 
-    for (const node: Node of layout.content) {
-        switch (node.type) {
-            case 'Kern':
-                pen.x += fontSize * node.amount
-                break
-            case 'Char':
-                context.fillText(node.char, pen.x, pen.y)
-                const [,,width] = getMetrics(node.char)
-                pen.x += fontSize * width
-                break
-        }
+    if (layout.type === 'text') {
+        context.fillText(layout.text, pen[0], pen[1])
+    } else if (layout.type === 'rect') {
+        context.fillRect(pen[0], pen[1], layout.width, layout.height)
+    } else if (layout.type === 'g') {
+        context.save()
+        context.translate(pen[0], pen[1])
+        layout.children.forEach((child) => drawLayout(context, child))
+        context.restore()
     }
-
-    context.restore()
 }
