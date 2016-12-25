@@ -1,8 +1,8 @@
 // @flow
 
-import process from './process'
+import process from '../process'
 
-import type {HBox, VBox} from './types'
+import type {HBox, VBox} from '../types'
 import {setAttributes} from './dom-utils'
 
 const svgNS = 'http://www.w3.org/2000/svg'

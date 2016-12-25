@@ -1,9 +1,9 @@
 // @flow
 import React from 'react'
 
-import type {HBox, VBox} from './types'
-import {height, depth, width} from './layout-utils'
-import process from './process'
+import type {HBox, VBox} from '../types'
+import {height, depth, width} from '../layout/measure-utils'
+import process from '../process'
 
 const svgNS = 'http://www.w3.org/2000/svg'
 
@@ -37,7 +37,7 @@ export default class Renderer extends React.Component {
         const w = fontSize * width(this.props.layout);
         const layout = process(this.props.layout);
 
-        return <svg width={w} height={h+d} viewBox={`0 0 ${w} ${h+d}`}>
+        return <svg style={{display: 'inline-block'}} width={w} height={h+d} viewBox={`0 0 ${w} ${h+d}`}>
             <g transform={`translate(0, ${h+1})`}>
                 {this._render(layout)}
             </g>

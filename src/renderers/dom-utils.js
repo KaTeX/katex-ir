@@ -7,9 +7,6 @@ export function setAttributes(elem: Element, attrs: AttributeMap) {
         const value = attrs[key]
         elem.setAttribute(key, `${value}`)
     })
-    // for (const [key, value] of Object.entries(attrs)) {
-    //     elem.setAttribute(key, `${value}`)  // 'value' cannot be coerced to string
-    // }
 }
 
 export function generateStyle(attrs: AttributeMap) {

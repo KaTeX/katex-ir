@@ -1,6 +1,5 @@
 import type {Node, Box, HBox, VBox, Char, VList, HList, Glue} from './types'
-import {getMetrics} from './metrics'
-import {width, vwidth} from './layout-utils'
+import {width, vwidth, getMetrics} from './layout/measure-utils'
 
 export default function process(layout: HBox | VBox, parentWidth?: number = 0): any {
     const fontSize = 32

@@ -1,8 +1,8 @@
 // @flow
 
-import type {Node, HBox, VBox, Char} from './types'
+import type {Node, HBox, VBox, Char} from '../types'
 import {generateStyle, setAttributes} from './dom-utils'
-import {getMetrics} from './metrics'
+import {getMetrics} from '../layout/measure-utils'
 
 const charHeight = (node: Char) => {
     const metrics = getMetrics(node.char);

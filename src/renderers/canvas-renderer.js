@@ -1,7 +1,6 @@
 // @flow
 
-import type {HBox, VBox, Node} from './types'
-import {getMetrics} from './metrics'
+import type {HBox, VBox, Node} from '../types'
 
 export function createCanvas(width: number, height: number) {
     const canvas = document.createElement('canvas')
