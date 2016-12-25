@@ -2,6 +2,7 @@
 import React from 'react'
 
 import type {HBox, VBox} from './types'
+import {height, depth, width} from './layout-utils'
 import process from './process'
 
 const svgNS = 'http://www.w3.org/2000/svg'
@@ -30,10 +31,14 @@ export default class Renderer extends React.Component {
     }
 
     render() {
+        const fontSize = 32;
+        const h = fontSize * height(this.props.layout);
+        const d = fontSize * depth(this.props.layout);
+        const w = fontSize * width(this.props.layout);
         const layout = process(this.props.layout);
 
-        return <svg width={320} height={200} viewBox='0 0 320 200'>
-            <g transform='translate(100, 100)'>
+        return <svg width={w} height={h+d} viewBox={`0 0 ${w} ${h+d}`}>
+            <g transform={`translate(0, ${h+1})`}>
                 {this._render(layout)}
             </g>
         </svg>

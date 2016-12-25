@@ -1,43 +1,6 @@
 import type {Node, Box, HBox, VBox, Char, VList, HList, Glue} from './types'
 import {getMetrics} from './metrics'
-
-const sum = (values: number[]): number => {
-    return values.reduce((res, val) => res + val, 0)
-}
-
-const charWidth = (node: Char) => {
-    const metrics = getMetrics(node.char);
-    if (!metrics) {
-        throw new Error(`no metrics for ${node.char}`)
-    }
-    return metrics[2]
-}
-
-const width = (node: Node): number => {
-    let result
-    switch (node.type) {
-        case 'Char': return charWidth(node)
-        case 'Box': return node.kind === 'VBox'
-            ? Math.max(...node.content.map(vwidth))
-            : sum(node.content.map(width))
-        case 'Kern': return node.amount
-        case 'Glue': return node.size
-        case 'Rule': return node.width !== '*' ? node.width : 0
-        default: return 0
-    }
-}
-
-const vwidth = (node: Node): number => {
-    let result
-    switch (node.type) {
-        case 'Char': return charWidth(node)
-        case 'Box': return node.kind === 'VBox'
-            ? Math.max(...node.content.map(vwidth))
-            : sum(node.content.map(width))
-        case 'Rule': return node.width !== '*' ? node.width : 0
-        default: return 0
-    }
-}
+import {width, vwidth} from './layout-utils'
 
 export default function process(layout: HBox | VBox, parentWidth?: number = 0): any {
     const fontSize = 32

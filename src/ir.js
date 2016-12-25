@@ -56,49 +56,6 @@ content.push(makeKern(thickmuskip))
 content.push(mainRegularChar('1'))
 content.push(mainRegularChar('2'))
 
-const charHeight = (node: Char) => {
-    const metrics = getMetrics(node.char);
-    if (!metrics) {
-        throw new Error(`no metrics for ${node.char}`)
-    }
-    return metrics[0]
-}
-
-const charDepth = (node: Char) => {
-    const metrics = getMetrics(node.char);
-    if (!metrics) {
-        throw new Error(`no metrics for ${node.char}`)
-    }
-    return metrics[1]
-}
-
-const height = (node: Node) => {
-    switch (node.type) {
-        // TODO: check the box kind
-        case 'Box':
-            return node.height // TODO: handle shift
-        case 'Rule':
-            return node.height === '*' ? 0 : node.height
-        case 'Char':
-            return charHeight(node)
-        default:
-            return 0
-    }
-}
-
-const depth = (node: Node) => {
-    switch (node.type) {
-        // TODO: check the box kind
-        case 'Box':
-            return node.depth // TODO: handle shift
-        case 'Rule':
-            return node.depth === '*' ? 0 : node.depth
-        case 'Char':
-            return charDepth(node)
-        default:
-            return 0
-    }
-}
 
 const hlistHeight = (hlist: HList) => Math.max(...hlist.map(height))
 const hlistDepth = (hlist: HList) => Math.max(...hlist.map(depth))
@@ -116,23 +73,14 @@ const makeHBox = (content: HList, shift = 0) => {
 
 const simpleRun: HBox = makeHBox(content)
 
-// console.log(simpleRun)
-
 const vsize = (node: Node) => {
     switch (node.type) {
-        case 'Char':
-            return charHeight(node) + charDepth(node)
-        case 'Box':
-            return node.height + node.depth
-        case 'Rule':
-            return (node.height === '*' ? 0 : node.height) +
-                (node.depth === '*' ? 0 : node.depth)
-        case 'Glue':
-            return node.size
-        case 'Kern':
-            return node.amount
-        default:
-            return 0
+        case 'Char': return height(node) + depth(node)
+        case 'Box': return height(node) + depth(node)
+        case 'Rule': return height(node) + depth(node)
+        case 'Glue': return node.size
+        case 'Kern': return node.amount
+        default: return 0
     }
 }
 
@@ -253,38 +201,52 @@ const expr = makeHBox([
 // console.log(`denominator depth = ${hlistDepth(denominator.content)}`);
 // console.log(`denominator height = ${hlistHeight(denominator.content)}`);
 
-import { createCanvas, drawLayout } from './canvas-renderer'
-import { createSvg, drawSvgLayout } from './svg-renderer'
-import { renderHTML } from './html-renderer'
+import {createCanvas, drawLayout} from './canvas-renderer'
+import {createSvg, drawSvgLayout} from './svg-renderer'
+import {renderHTML} from './html-renderer'
+import {width, height, depth} from './layout-utils'
+
+const svgNS = 'http://www.w3.org/2000/svg'
 
 WebFont.load({
     custom: {
         families: ['Main_Regular:n4'],
     },
     active: function(familyName, fvd) {
-        const context = createCanvas(320, 200)
+        const fontSize = 32
+        const w = fontSize * width(expr)
+        const h = fontSize * height(expr)
+        const d = fontSize * depth(expr)
+
+        // canvas
+        const context = createCanvas(w, h + d)
         if (context) {
-            context.translate(100, 100)
+            context.translate(0, h + 1)
             drawLayout(context, process(expr))
         }
 
-        const svg = createSvg(320, 200);
-        if (svg) {
-            drawSvgLayout(svg, expr);
+        // SVG
+        const svg = createSvg(w, h + d);
+        const g = document.createElementNS(svgNS, 'g')
+
+        if (svg && g) {
+            drawSvgLayout(g, expr)
+            g.setAttribute('transform', `translate(0, ${h + 1})`)
+            svg.appendChild(g)
         }
 
+        // HTML
         const container = document.createElement('span')
         renderHTML(container, expr)
         const wrapper = document.createElement('div')
         wrapper.style.border = 'solid 1px gray'
+        wrapper.style.display = 'inline-block'
         wrapper.appendChild(container)
         document.body.appendChild(wrapper)
 
+        // SVG + React
         const reactContainer = document.createElement('div')
         document.body.appendChild(reactContainer)
         ReactDOM.render(<Renderer layout={expr}/>, reactContainer)
-
-        const result = process(expr)
-        console.log(result)
     },
 });
