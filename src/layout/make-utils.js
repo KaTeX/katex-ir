@@ -23,7 +23,9 @@ export function makeChar(font: FontId, char: string): Char {
     }
 }
 
-export const mainRegularChar = makeChar.bind(null, 'Main-Regular');
+export const mainRegularChar = makeChar.bind(null, 'Main_Regular')
+
+export const mathRegularChar = makeChar.bind(null, 'Math_Regular')
 
 export function makeKern(amount: number): Kern {
     return {

@@ -59,7 +59,7 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                         const text = {
                             type: 'text',
                             pen: [...pen],
-                            fontFamily: 'Main_Regular',
+                            fontFamily: node.font,
                             fontSize: fontSize,
                             text: node.char,
                         }
@@ -99,7 +99,7 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                         const text = {
                             type: 'text',
                             pen: [...pen],
-                            fontFamily: 'Main_Regular',
+                            fontFamily: node.font,
                             fontSize: fontSize,
                             text: node.char,
                         }

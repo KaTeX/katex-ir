@@ -22,6 +22,7 @@ import sigmas from './data/sigmas'
 import {
     makeChar,
     mainRegularChar,
+    mathRegularChar,
     makeKern,
     makeRule,
     makeVBox,
@@ -165,6 +166,14 @@ const exponent = makeHBox([
     ], 0.5),
 ])
 
+const variable = makeHBox([
+    mathRegularChar('x'),
+    makeKern(thinmuskip),
+    mainRegularChar('+'),
+    makeKern(thinmuskip),
+    mathRegularChar('y'),
+])
+
 const renderRow = (expr) => {
     const row = document.createElement('div')
     row.setAttribute('class', 'row')
@@ -208,11 +217,12 @@ const svgNS = 'http://www.w3.org/2000/svg'
 
 WebFont.load({
     custom: {
-        families: ['Main_Regular:n4'],
+        families: ['Main_Regular:n4', 'Math_Regular:n4'],
     },
     active: function(familyName, fvd) {
         renderRow(expr)
         renderRow(nestedFraction)
         renderRow(exponent)
+        renderRow(variable)
     },
 });
