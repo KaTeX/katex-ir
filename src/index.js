@@ -149,6 +149,13 @@ const nestedFraction = makeHBox([
     makeKern(1.2 / 10),
 ])
 
+const styles = {
+    DISPLAY: 'D',
+    TEXT: 'T',
+    SCRIPT: 'S',
+    SCRIPTSCRIPT: 'SS',
+}
+
 const exponent = makeHBox([
     mainRegularChar('1'),
     makeKern(thinmuskip),
@@ -156,14 +163,14 @@ const exponent = makeHBox([
     makeKern(thinmuskip),
     mainRegularChar('2'),
     makeHBox([
-         mainRegularChar('2'),
-         makeHBox([
-            mainRegularChar('2'),
+        mainRegularChar('2', styles.SCRIPT),
+        makeHBox([
+            mainRegularChar('2', styles.SCRIPTSCRIPT),
             makeHBox([
-                mainRegularChar('2'),
-            ], 0.5),
-        ], 0.5),
-    ], 0.5),
+                mainRegularChar('2', styles.SCRIPTSCRIPT),
+            ], 0.5 * 0.5),
+        ], 0.5 * 0.7),
+    ], 0.5 * 1.0),
 ])
 
 const variable = makeHBox([

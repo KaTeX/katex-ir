@@ -14,13 +14,8 @@ export function createCanvas(width: number, height: number) {
 function draw(context: CanvasRenderingContext2D, layout: any) {
     const pen = layout.pen
 
-    // TODO(kevinb) keep track of font and change it as necessary
-    const fontSize = 32
-
     if (layout.type === 'text') {
-        console.log(layout)
-        context.font = `${fontSize}px ${layout.fontFamily}`
-        console.log(context.font)
+        context.font = `${layout.fontSize}px ${layout.fontFamily}`
         context.fillText(layout.text, pen[0], pen[1])
     } else if (layout.type === 'rect') {
         context.fillRect(pen[0], pen[1], layout.width, layout.height)

@@ -16,6 +16,8 @@ export type VBox = Box & { kind: 'VBox' }
 
 export type FontId = string
 
+export type Style = 'D' | 'T' | 'S' | 'SS'
+
 export type Char = {
     type: 'Char',
     font: FontId,

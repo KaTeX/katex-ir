@@ -56,16 +56,22 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                         pen[0] += fontSize * width(node)
                         break
                     case 'Char':
+                        let multiplier = 1
+                        if (node.style === 'S') {
+                            multiplier = 0.7
+                        } else if (node.style === 'SS') {
+                            multiplier = 0.5
+                        }
                         const text = {
                             type: 'text',
                             pen: [...pen],
                             fontFamily: node.font,
-                            fontSize: fontSize,
+                            fontSize: fontSize * multiplier,
                             text: node.char,
                         }
                         result.children.push(text)
                         const [,,w] = getMetrics(node.char)
-                        pen[0] += fontSize * w
+                        pen[0] += fontSize * multiplier * w
                         break
                     case 'Kern':
                         pen[0] += fontSize * node.amount

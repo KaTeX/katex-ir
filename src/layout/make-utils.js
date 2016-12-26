@@ -11,21 +11,34 @@ import type {
     FontId,
     Node,
     Glue,
-    GlueMeasurement
+    GlueMeasurement,
+    Style,
 } from '../types'
 import {height, depth} from './measure-utils'
 
-export function makeChar(font: FontId, char: string): Char {
+const styles = {
+    DISPLAY: 'D',
+    TEXT: 'T',
+    SCRIPT: 'S',
+    SCRIPTSCRIPT: 'SS',
+}
+
+export function makeChar(font: FontId, style: Style, char: string): Char {
     return {
         type: 'Char',
         font: font,
+        style: style,
         char: char,
     }
 }
 
-export const mainRegularChar = makeChar.bind(null, 'Main_Regular')
+export function mainRegularChar(char: string, style:Style = 'T') {
+    return makeChar('Main_Regular', style, char)
+}
 
-export const mathRegularChar = makeChar.bind(null, 'Math_Regular')
+export function mathRegularChar(char: string, style:Style = 'T') {
+    return makeChar('Math_Regular', style, char)
+}
 
 export function makeKern(amount: number): Kern {
     return {
