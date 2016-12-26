@@ -1,7 +1,7 @@
 import type {Node, Box, HBox, VBox, Char, VList, HList, Glue} from './types'
-import {width, vwidth, getMetrics} from './layout/measure-utils'
+import {height, width, vwidth, getMetrics} from './layout/measure-utils'
 
-export default function process(layout: HBox | VBox, parentWidth?: number = 0): any {
+function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
     const fontSize = 32
     const pen = [0, 0]
     const result = {
@@ -49,7 +49,7 @@ export default function process(layout: HBox | VBox, parentWidth?: number = 0): 
             for (const node: Node of layout.content) {
                 switch (node.type) {
                     case 'Box':
-                        const g = process(node, naturalWidth2)
+                        const g = _process(node, naturalWidth2)
                         const shift = fontSize * node.shift
                         g.pen = [pen[0], pen[1] - shift]
                         result.children.push(g)
@@ -90,7 +90,7 @@ export default function process(layout: HBox | VBox, parentWidth?: number = 0): 
                 switch (node.type) {
                     case 'Box':
                         pen[1] += fontSize * node.height
-                        const g = process(node, naturalWidth)
+                        const g = _process(node, naturalWidth)
                         g.pen = [...pen]
                         result.children.push(g)
                         pen[1] += fontSize * node.depth
@@ -131,4 +131,11 @@ export default function process(layout: HBox | VBox, parentWidth?: number = 0): 
     }
 
     return result;
+}
+
+export default function process(layout: HBox | VBox) {
+    const fontSize = 32
+    const result = _process(layout)
+    result.pen[1] += fontSize * height(layout)
+    return result
 }

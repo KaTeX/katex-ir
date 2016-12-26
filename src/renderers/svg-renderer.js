@@ -10,9 +10,10 @@ const svgNS = 'http://www.w3.org/2000/svg'
 export function createSvg(width: number, height: number) {
     const svg = document.createElementNS(svgNS, 'svg')
     setAttributes(svg, {
-        width, height, viewBox: `0 0 ${width} ${height}`,
+        width: width + 2,
+        height: height + 2,
+        viewBox: `-1 -1 ${width + 2} ${height + 2}`,
     });
-    document.body.appendChild(svg);
     return svg;
 }
 

@@ -47,56 +47,46 @@ const xi8 = 0.04; // default rule width
 
 
 const content: HList = [];
-content.push(mainRegularChar('5'))
-content.push(makeKern(thinmuskip))
-content.push(mainRegularChar('+'))
-content.push(makeKern(thinmuskip))
-content.push(mainRegularChar('7'))
-content.push(makeKern(thickmuskip))
-content.push(mainRegularChar('='))
-content.push(makeKern(thickmuskip))
-content.push(mainRegularChar('1'))
-content.push(mainRegularChar('2'))
 
-const simpleRun: HBox = makeHBox(content)
-
-
-const numerator = makeHBox([
-    mainRegularChar('1')
-])
-
-const denominator = makeHBox([
-    mainRegularChar('2'),
+const simpleRun: HBox = makeHBox([
+    mainRegularChar('5'),
     makeKern(thinmuskip),
     mainRegularChar('+'),
     makeKern(thinmuskip),
-    mainRegularChar('3'),
+    mainRegularChar('7'),
+    makeKern(thickmuskip),
+    mainRegularChar('='),
+    makeKern(thickmuskip),
+    mainRegularChar('1'),
+    mainRegularChar('2'),
 ])
 
-
-const fraction = makeVBox(
-    makeRule(0.5 * xi8, 0.5 * xi8, '*'), // reference node
-    [
-        makeHBox([
-            makeGlue(0, hfil()),
-            numerator,
-            makeGlue(0, hfil()),
-        ]),
-        // TODO(kevinb) figure out the correct numShift
-        makeKern(sigmas.num1[0] / 2),
-    ], // upList
-    [
-        // TODO(kevinb) figure out the correct denomShift
-        makeKern(sigmas.denom1[0] / 2),
-        makeHBox([
-            makeGlue(0, hfil()),
-            denominator,
-            makeGlue(0, hfil()),
-        ]),
-    ], // dnList
-    sigmas.axisHeight[0],
-)
-
+const makeFraction = (numerator, denominator) => {
+    return makeVBox(
+        makeRule(0.5 * xi8, 0.5 * xi8, '*'), // reference node
+        [
+            // numerator
+            makeHBox([
+                makeGlue(0, hfil()),
+                numerator,
+                makeGlue(0, hfil()),
+            ]),
+            // TODO(kevinb) figure out the correct numShift
+            makeKern(sigmas.num1[0] / 2),
+        ], // upList
+        [
+            // TODO(kevinb) figure out the correct denomShift
+            makeKern(sigmas.denom1[0] / 2),
+            // numerator
+            makeHBox([
+                makeGlue(0, hfil()),
+                denominator,
+                makeGlue(0, hfil()),
+            ]),
+        ], // dnList
+        sigmas.axisHeight[0],
+    )
+}
 
 // TODO(kevinb) put the fraction in an HBox with 1.2 pt kerns on either side
 // TODO(kevinb) all distances should have a unit of measure, e.g. em, pt, etc.
@@ -108,7 +98,18 @@ const expr = makeHBox([
     mainRegularChar('+'),
     makeKern(medmuskip), // this should change depending on the current style
     makeKern(1.2 / 10), // scaled according to the base font size, not the current style
-    fraction,
+    makeFraction(
+        makeHBox([
+            mainRegularChar('1')
+        ]),
+        makeHBox([
+            mainRegularChar('2'),
+            makeKern(thinmuskip),
+            mainRegularChar('+'),
+            makeKern(thinmuskip),
+            mainRegularChar('3'),
+        ])
+    ),
     makeKern(1.2 / 10),
     makeKern(medmuskip),
     mainRegularChar('+'),
@@ -117,6 +118,92 @@ const expr = makeHBox([
     mainRegularChar('7'),
 ])
 
+const nestedFraction = makeHBox([
+    makeKern(1.2 / 10),
+    makeFraction(
+        makeHBox([
+            mainRegularChar('1')
+        ]),
+        makeHBox([
+            mainRegularChar('2'),
+            makeKern(thinmuskip),
+            mainRegularChar('+'),
+            makeKern(thinmuskip),
+            makeKern(1.2 / 10),
+            makeFraction(
+                makeHBox([
+                    mainRegularChar('1')
+                ]),
+                makeHBox([
+                    mainRegularChar('2'),
+                    makeKern(thinmuskip),
+                    mainRegularChar('+'),
+                    makeKern(thinmuskip),
+                    mainRegularChar('3'),
+                ])
+            ),
+            makeKern(1.2 / 10),
+        ])
+    ),
+    makeKern(1.2 / 10),
+])
+
+const exponent = makeHBox([
+    mainRegularChar('1'),
+    makeKern(thinmuskip),
+    mainRegularChar('+'),
+    makeKern(thinmuskip),
+    mainRegularChar('2'),
+    makeHBox([
+         mainRegularChar('2'),
+         makeHBox([
+            mainRegularChar('2'),
+            makeHBox([
+                mainRegularChar('2'),
+            ], 0.5),
+        ], 0.5),
+    ], 0.5),
+])
+
+const renderRow = (expr) => {
+    const row = document.createElement('div')
+    row.setAttribute('class', 'row')
+
+    const fontSize = 32
+    const w = fontSize * width(expr)
+    const h = fontSize * height(expr)
+    const d = fontSize * depth(expr)
+
+    // canvas
+    const canvas = createCanvas(w, h + d)
+    row.appendChild(canvas)
+    drawLayout(canvas, expr)
+
+    // SVG
+    const svg = createSvg(w, h + d);
+    if (svg) {
+        drawSvgLayout(svg, expr)
+        row.appendChild(svg)
+    }
+
+    // SVG + React
+    const reactContainer = document.createElement('div')
+    reactContainer.style.display = 'inline'
+    row.appendChild(reactContainer)
+    ReactDOM.render(<SvgComponent layout={expr}/>, reactContainer)
+
+    // HTML
+    // const container = document.createElement('span')
+    // renderHTML(container, nestedFraction)
+    // const wrapper = document.createElement('div')
+    // wrapper.style.border = 'solid 1px gray'
+    // wrapper.style.display = 'inline-block'
+    // wrapper.appendChild(container)
+    // document.body.appendChild(wrapper)
+
+    document.body.appendChild(row)
+}
+
 const svgNS = 'http://www.w3.org/2000/svg'
 
 WebFont.load({
@@ -124,41 +211,8 @@ WebFont.load({
         families: ['Main_Regular:n4'],
     },
     active: function(familyName, fvd) {
-        const fontSize = 32
-        const w = fontSize * width(expr)
-        const h = fontSize * height(expr)
-        const d = fontSize * depth(expr)
-
-        // canvas
-        const context = createCanvas(w, h + d)
-        if (context) {
-            context.translate(0, h + 1)
-            drawLayout(context, process(expr))
-        }
-
-        // SVG
-        const svg = createSvg(w, h + d);
-        const g = document.createElementNS(svgNS, 'g')
-
-        if (svg && g) {
-            drawSvgLayout(g, expr)
-            g.setAttribute('transform', `translate(0, ${h + 1})`)
-            svg.appendChild(g)
-        }
-
-        // HTML
-        const container = document.createElement('span')
-        renderHTML(container, expr)
-        const wrapper = document.createElement('div')
-        wrapper.style.border = 'solid 1px gray'
-        wrapper.style.display = 'inline-block'
-        wrapper.appendChild(container)
-        document.body.appendChild(wrapper)
-
-        // SVG + React
-        const reactContainer = document.createElement('div')
-        reactContainer.style.display = 'inline'
-        document.body.appendChild(reactContainer)
-        ReactDOM.render(<SvgComponent layout={expr}/>, reactContainer)
+        renderRow(expr)
+        renderRow(nestedFraction)
+        renderRow(exponent)
     },
 });

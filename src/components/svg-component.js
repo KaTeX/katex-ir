@@ -37,10 +37,13 @@ export default class Renderer extends React.Component {
         const w = fontSize * width(this.props.layout);
         const layout = process(this.props.layout);
 
-        return <svg style={{display: 'inline-block'}} width={w} height={h+d} viewBox={`0 0 ${w} ${h+d}`}>
-            <g transform={`translate(0, ${h+1})`}>
-                {this._render(layout)}
-            </g>
+        return <svg
+            style={{display: 'inline-block'}}
+            width={w + 2}
+            height={h + d + 2}
+            viewBox={`-1 -1 ${w + 2} ${h + d + 2}`}
+        >
+            {this._render(layout)}
         </svg>
     }
 }
