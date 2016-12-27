@@ -1,5 +1,5 @@
 import type {Node, Box, HBox, VBox, Char, VList, HList, Glue} from './types'
-import {height, width, vwidth, getMetrics} from './layout/measure-utils'
+import {height, depth, width, vwidth} from './layout/measure-utils'
 
 function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
     const fontSize = 32
@@ -70,8 +70,7 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                             text: node.char,
                         }
                         result.children.push(text)
-                        const [,,w] = getMetrics(node.char)
-                        pen[0] += fontSize * multiplier * w
+                        pen[0] += fontSize * width(node)
                         break
                     case 'Kern':
                         pen[0] += fontSize * node.amount
@@ -110,8 +109,7 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                             text: node.char,
                         }
                         result.children.push(text)
-                        const [height, depth, ] = getMetrics(node.char)
-                        pen[1] += fontSize * (height + depth)
+                        pen[1] += fontSize * (height(node) + depth(node))
                         break
                     case 'Kern':
                         pen[1] += fontSize * node.amount

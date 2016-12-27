@@ -175,10 +175,12 @@ const exponent = makeHBox([
 
 // All expressions must have an HBox as the parent
 const fraction2 = makeHBox([
+    makeKern(1.2 / 10),
     makeFraction(
         makeHBox([mainRegularChar('1')]),
         exponent
     ),
+    makeKern(1.2 / 10),
 ])
 
 const subscript = makeHBox([

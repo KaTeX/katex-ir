@@ -64,7 +64,13 @@ export function charWidth(node: Char): number {
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
-    return metrics[2]
+    let multiplier = 1.0
+    if (node.style === 'S') {
+        multiplier = 0.7
+    } else if (node.style === 'SS') {
+        multiplier = 0.5
+    }
+    return multiplier * metrics[2]
 }
 
 export function width(node: Node): number {
