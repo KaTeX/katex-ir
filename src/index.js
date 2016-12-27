@@ -173,6 +173,31 @@ const exponent = makeHBox([
     ], 0.5 * 1.0),
 ])
 
+// All expressions must have an HBox as the parent
+const fraction2 = makeHBox([
+    makeFraction(
+        makeHBox([mainRegularChar('1')]),
+        exponent
+    ),
+])
+
+const subscript = makeHBox([
+    mainRegularChar('1'),
+    makeKern(thinmuskip),
+    mainRegularChar('+'),
+    makeKern(thinmuskip),
+    mainRegularChar('2'),
+    makeHBox([
+        mainRegularChar('2', styles.SCRIPT),
+        makeHBox([
+            mainRegularChar('2', styles.SCRIPTSCRIPT),
+            makeHBox([
+                mainRegularChar('2', styles.SCRIPTSCRIPT),
+            ], -0.25 * 1.0),  // This looks better, not sure why
+        ], -0.25 * 1.0),
+    ], -0.25 * 1.0),
+])
+
 const variable = makeHBox([
     mathRegularChar('x'),
     makeKern(thinmuskip),
@@ -230,6 +255,8 @@ WebFont.load({
         renderRow(expr)
         renderRow(nestedFraction)
         renderRow(exponent)
+        renderRow(fraction2)
+        renderRow(subscript)
         renderRow(variable)
     },
 });

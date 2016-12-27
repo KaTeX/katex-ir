@@ -98,7 +98,13 @@ export function charHeight(node: Char): number {
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
-    return metrics[0]
+    let multiplier = 1.0
+    if (node.style === 'S') {
+        multiplier = 0.7
+    } else if (node.style === 'SS') {
+        multiplier = 0.5
+    }
+    return multiplier * metrics[0]
 }
 
 export function charDepth(node: Char): number {
@@ -106,7 +112,13 @@ export function charDepth(node: Char): number {
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
-    return metrics[1]
+    let multiplier = 1.0
+    if (node.style === 'S') {
+        multiplier = 0.7
+    } else if (node.style === 'SS') {
+        multiplier = 0.5
+    }
+    return multiplier * metrics[1]
 }
 
 // TODO: handle Glue and Kern

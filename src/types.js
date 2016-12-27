@@ -22,6 +22,7 @@ export type Char = {
     type: 'Char',
     font: FontId,
     char: string,
+    style: Style,
 }
 
 // TODO(kevinb) add units to the dimensions
