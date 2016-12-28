@@ -34,7 +34,6 @@ import {
 import SvgComponent from './components/svg-component'
 import {createCanvas, drawLayout} from './renderers/canvas-renderer'
 import {createSvg, drawSvgLayout} from './renderers/svg-renderer'
-import {renderHTML} from './renderers/html-renderer'
 import {width, height, depth} from './layout/measure-utils'
 
 
@@ -208,6 +207,13 @@ const variable = makeHBox([
     mathRegularChar('y'),
 ])
 
+const roots = makeHBox([
+    makeChar('KaTeX_Size1', 'T', '\u221A'),
+    makeChar('KaTeX_Size2', 'T', '\u221A'),
+    makeChar('KaTeX_Size3', 'T', '\u221A'),
+    makeChar('KaTeX_Size4', 'T', '\u221A'),
+])
+
 const renderRow = (expr) => {
     const row = document.createElement('div')
     row.setAttribute('class', 'row')
@@ -251,7 +257,16 @@ const svgNS = 'http://www.w3.org/2000/svg'
 
 WebFont.load({
     custom: {
-        families: ['Main_Regular:n4', 'Math_Regular:n4'],
+        families: [
+            'KaTeX_Main:n4', 'KaTeX_Math:n4',
+            'KaTeX_Size1:n4', 'KaTeX_Size2:n4', 'KaTeX_Size3:n4', 'KaTeX_Size4:n4',
+        ],
+        testStrings: {
+            'KaTeX_Size1': '()[]',
+            'KaTeX_Size2': '()[]',
+            'KaTeX_Size3': '()[]',
+            'KaTeX_Size4': '()[]'
+        }
     },
     active: function(familyName, fvd) {
         renderRow(expr)
@@ -260,5 +275,6 @@ WebFont.load({
         renderRow(fraction2)
         renderRow(subscript)
         renderRow(variable)
+        renderRow(roots)
     },
 });

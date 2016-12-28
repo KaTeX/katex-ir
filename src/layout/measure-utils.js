@@ -47,9 +47,16 @@ var fontMap = {
     },
 };
 
-export function getMetrics(char: string) {
-    const code = char.charCodeAt(0);
-    const fontName = "Main-Regular";
+export function getMetrics(node: Char) {
+    const code = node.char.charCodeAt(0);
+    let fontName;
+    if (node.char === '\u221A') {
+        fontName = node.font.split('_')[1] + '-Regular'
+    } else if (/[a-z]/.test(node.char)) {
+        fontName = 'Math-Regular'
+    } else {
+        fontName = 'Main-Regular'
+    }
     const [depth, height, italic, skew, width] = metrics[fontName][code];
     return [height, depth, width];
 }
@@ -60,7 +67,7 @@ export function sum(values: number[]): number {
 }
 
 export function charWidth(node: Char): number {
-    const metrics = getMetrics(node.char);
+    const metrics = getMetrics(node);
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
@@ -100,7 +107,7 @@ export function vwidth(node: Node): number {
 }
 
 export function charHeight(node: Char): number {
-    const metrics = getMetrics(node.char);
+    const metrics = getMetrics(node);
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }
@@ -114,7 +121,7 @@ export function charHeight(node: Char): number {
 }
 
 export function charDepth(node: Char): number {
-    const metrics = getMetrics(node.char);
+    const metrics = getMetrics(node);
     if (!metrics) {
         throw new Error(`no metrics for ${node.char}`)
     }

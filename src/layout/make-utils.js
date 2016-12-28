@@ -33,11 +33,11 @@ export function makeChar(font: FontId, style: Style, char: string): Char {
 }
 
 export function mainRegularChar(char: string, style:Style = 'T') {
-    return makeChar('Main_Regular', style, char)
+    return makeChar('KaTeX_Main', style, char)
 }
 
 export function mathRegularChar(char: string, style:Style = 'T') {
-    return makeChar('Math_Regular', style, char)
+    return makeChar('KaTeX_Math', style, char)
 }
 
 export function makeKern(amount: number): Kern {
