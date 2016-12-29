@@ -45,6 +45,7 @@ const thickmuskip = 0.27778;
 
 const xi8 = 0.04; // default rule width
 
+const ptPerEm = 10
 
 const content: HList = [];
 
@@ -97,7 +98,7 @@ const expr = makeHBox([
     makeKern(medmuskip),
     mainRegularChar('+'),
     makeKern(medmuskip), // this should change depending on the current style
-    makeKern(1.2 / 10), // scaled according to the base font size, not the current style
+    makeKern(1.2 / ptPerEm), // scaled according to the base font size, not the current style
     makeFraction(
         makeHBox([
             mainRegularChar('1')
@@ -110,7 +111,7 @@ const expr = makeHBox([
             mainRegularChar('3'),
         ])
     ),
-    makeKern(1.2 / 10),
+    makeKern(1.2 / ptPerEm),
     makeKern(medmuskip),
     mainRegularChar('+'),
     makeKern(medmuskip),
@@ -119,7 +120,7 @@ const expr = makeHBox([
 ])
 
 const nestedFraction = makeHBox([
-    makeKern(1.2 / 10),
+    makeKern(1.2 / ptPerEm),
     makeFraction(
         makeHBox([
             mainRegularChar('1')
@@ -129,7 +130,7 @@ const nestedFraction = makeHBox([
             makeKern(thinmuskip),
             mainRegularChar('+'),
             makeKern(thinmuskip),
-            makeKern(1.2 / 10),
+            makeKern(1.2 / ptPerEm),
             makeFraction(
                 makeHBox([
                     mainRegularChar('1')
@@ -142,10 +143,10 @@ const nestedFraction = makeHBox([
                     mainRegularChar('3'),
                 ])
             ),
-            makeKern(1.2 / 10),
+            makeKern(1.2 / ptPerEm),
         ])
     ),
-    makeKern(1.2 / 10),
+    makeKern(1.2 / ptPerEm),
 ])
 
 const styles = {
@@ -207,10 +208,79 @@ const variable = makeHBox([
     mathRegularChar('y'),
 ])
 
+const underRoot = makeVBox(
+    makeHBox([
+        mathRegularChar('x'),
+        makeKern(thinmuskip),
+        mainRegularChar('+'),
+        makeKern(thinmuskip),
+        mainRegularChar('1'),
+        makeKern(0.35878 / ptPerEm),
+    ]),
+    [
+        makeRule(0.5 * xi8, 0.5 * xi8, '*'),
+        makeKern(1.6493 / ptPerEm),
+    ],
+    []
+)
+
+const underRoot1 = makeVBox(
+    makeHBox([
+        mathRegularChar('x'),
+        makeHBox([
+            mainRegularChar('2', styles.SCRIPT),
+        ], 0.5 * 1.0),
+        makeKern(0.35878 / ptPerEm),
+    ]),
+    [
+        makeRule(0.5 * xi8, 0.5 * xi8, '*'),
+        makeKern(1.6493 / ptPerEm),
+    ],
+    []
+)
+
+const underRoot2 = makeVBox(
+    makeHBox([
+        mathRegularChar('y'),
+        makeHBox([
+            mainRegularChar('2', styles.SCRIPT),
+        ], 0.5 * 1.0),
+        makeKern(0.35878 / ptPerEm),
+    ]),
+    [
+        makeRule(0.5 * xi8, 0.5 * xi8, '*'),
+        makeKern(1.6493 / ptPerEm),
+    ],
+    []
+)
+
+const underRoot3 = makeVBox(
+    makeFraction(
+        makeHBox([mainRegularChar('1')]),
+        makeHBox([mathRegularChar('x')]),
+    ),
+    [
+        makeRule(0.5 * xi8, 0.5 * xi8, '*'),
+        makeKern(1.6493 / ptPerEm),
+    ],
+    []
+)
+
+const root = makeChar('KaTeX_Main', 'T', '\u221A')
+const root1 = makeChar('KaTeX_Size1', 'T', '\u221A')
+const root2 = makeChar('KaTeX_Size2', 'T', '\u221A')
+const root3 = makeChar('KaTeX_Size3', 'T', '\u221A')
+
 const roots = makeHBox([
-    makeChar('KaTeX_Size1', 'T', '\u221A'),
-    makeChar('KaTeX_Size2', 'T', '\u221A'),
-    makeChar('KaTeX_Size3', 'T', '\u221A'),
+    // line up the top of underRoot1 with the top of root1
+    makeHBox([root], height(underRoot) - height(root)),
+    underRoot,
+    makeHBox([root1], height(underRoot1) - height(root1)),
+    underRoot1,
+    makeHBox([root2], height(underRoot2) - height(root2)),
+    underRoot2,
+    makeHBox([root3], height(underRoot3) - height(root3)),
+    underRoot3,
     makeChar('KaTeX_Size4', 'T', '\u221A'),
 ])
 

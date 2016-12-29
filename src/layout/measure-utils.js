@@ -58,6 +58,10 @@ export function getMetrics(node: Char) {
         fontName = 'Main-Regular'
     }
     const [depth, height, italic, skew, width] = metrics[fontName][code];
+    if (node.char === '\u221A') {
+        console.log(`${node.font} = ${width} x ${height + depth}`);
+
+    }
     return [height, depth, width];
 }
 

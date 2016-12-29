@@ -82,6 +82,23 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                             pen[0] += fontSize * node.size
                         }
                         break
+                    case 'Rule':
+                        // TODO(kevinb) handle height and depth being '*'
+                        if (node.width !== '*' && node.height !== '*' && node.depth !== '*') {
+                            pen[1] -= fontSize * node.height
+                            const rect = {
+                                type: 'rect',
+                                pen: [...pen],
+                                width: fontSize * node.width,
+                                height: fontSize * (node.height + node.depth),
+                                fill: 'black',      // TODO(kevinb) update the color
+                            }
+                            pen[0] += rect.width
+                            result.children.push(rect)
+                        }
+                        break
+                    default:
+                        console.log(`unhandled node of type: ${node.type}`)
                 }
             }
 
@@ -129,7 +146,7 @@ function _process(layout: HBox | VBox, parentWidth?: number = 0): any {
                         }
                         break
                     default:
-                        console.log(`unhandled node of type: ${node.type}`);
+                        console.log(`unhandled node of type: ${node.type}`)
                 }
             }
     }
