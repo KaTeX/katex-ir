@@ -1,0 +1,31 @@
+body {
+    font-size: 48px;
+}
+  
+.vbox {
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+  
+.hbox {
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    width: 100%;
+}
+  
+.rule {
+    -ms-flex: 0 0 4px;
+    flex: 0 0 4px;
+    background: black;
+    display: inline-block;
+}
+  
+.glue {
+    display: -ms-inline-flexbox;
+    -ms-flex: 1 1 0px;
+    flex: 1 1 0px;
+}
