@@ -12,6 +12,7 @@
   "author": "Kevin Barabash <kevinb@khanacademy.org>",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "babel-loader": "^6.2.7",
     "babel-plugin-syntax-flow": "^6.18.0",
     "babel-plugin-transform-flow-strip-types": "^6.18.0",
